@@ -1,6 +1,6 @@
 import authConfig from '@/config/auth.config';
 import { User } from '@domain/users/entities/user.entity';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-google-oauth20';
@@ -19,12 +19,14 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy, 'google') {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
+    Logger.log(accessToken, refreshToken, profile);
     const { id, name, emails, photos } = profile;
     const user = {
       provider: 'google',
       providerId: id,
       email: emails[0].value,
       name: `${name.givenName} ${name.familyName}`,
+      role: [],
       // picture: photos[0].value,
     } satisfies User;
 

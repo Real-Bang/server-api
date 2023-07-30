@@ -17,13 +17,25 @@ export class AuthService {
     private usersService: UsersService,
   ) {}
 
-  async logIn(user: User) {
+  async getToken(user: CreateUserDto) {
     Logger.log(user);
     if (!user) {
       throw new BadRequestException('Unauthenticated.');
     }
 
-    const payload: JwtPayload = { username: user.name, sub: user.providerId };
+    const registeredUser = await this.usersService.findOne(
+      user.provider,
+      user.providerId,
+    );
+
+    if (!registeredUser) {
+      this.register(user);
+    }
+
+    const payload: JwtPayload = {
+      provider: user.provider,
+      providerId: user.providerId,
+    };
     return {
       accessToken: await this.jwtService.signAsync(payload),
     };
@@ -31,7 +43,7 @@ export class AuthService {
 
   register(user: CreateUserDto) {
     try {
-      const newUser = this.usersService.create(user);
+      this.usersService.create(user);
     } catch {
       throw new InternalServerErrorException();
     }

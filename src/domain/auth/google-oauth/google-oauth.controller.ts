@@ -21,7 +21,7 @@ export class GoogleOauthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { accessToken } = await this.authService.logIn(req.user);
+    const { accessToken } = await this.authService.getToken(req.user);
     res.cookie('jwt', accessToken, {
       httpOnly: true,
       sameSite: 'lax',

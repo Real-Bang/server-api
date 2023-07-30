@@ -15,7 +15,58 @@ model User {
   providerId String
   name       String
   email      String
+  role       Role[] @default([])
 
   @@id([provider, providerId])
 }
 
+model Room {
+  id Int @id @default(autoincrement())
+
+  // images
+  thumbnailUrl String?
+  photoUrl     String[]
+
+  // simple
+  roomType          RoomType  @relation(fields: [roomTypeKey], references: [key]) // 방
+  roomTypeKey       String
+  priceType         PriceType @relation(fields: [priceTypeKey], references: [key]) // 전세/월세 타입
+  priceTypeKey      String
+  depositPrice      Int? // 보증금
+  rentPrice         Int // 월세/전세
+  maintenancePrice  Int? // 관리비
+  area              Float // 면적
+  address           String // 주소
+  descriptionSimple String // 설명
+
+  // details
+  floorOfRoom         Int
+  floorTotal          Int
+  numOfRooms          Int
+  parkAvailable       Boolean
+  descriptionDetailed String       @default("")
+  options             RoomOption[]
+}
+
+model RoomOption {
+  key  String @id
+  name String
+  Room Room[]
+}
+
+model RoomType {
+  key  String @id
+  name String
+  Room Room[]
+}
+
+model PriceType {
+  key  String @id
+  name String
+  Room Room[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
