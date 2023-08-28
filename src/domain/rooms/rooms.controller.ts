@@ -1,4 +1,5 @@
-import { IUploadsService } from '@/uploads/uploads.service';
+import { IUploadsService } from '@/domain/uploads/uploads.service';
+import { CursorPaginationDto } from '@/utils/pagination/pagination.cursor.dto';
 import {
   Body,
   Controller,
@@ -6,16 +7,11 @@ import {
   Get,
   Inject,
   Param,
-  ParseFilePipeBuilder,
   Patch,
   Post,
   Query,
-  UploadedFiles,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
 import {
-  ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
@@ -26,7 +22,6 @@ import {
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { RoomsService } from './rooms.service';
-import { CursorPaginationDto } from '@/utils/pagination/pagination.cursor.dto';
 
 @Controller('rooms')
 @ApiTags('방')
@@ -91,26 +86,10 @@ export class RoomsController {
 
   @Post()
   @ApiOperation({ summary: '방 생성', description: '방을 생성한다.' })
-  @ApiConsumes('multipart/form-data')
   @ApiCreatedResponse({ description: '생성 완료' })
   @ApiUnprocessableEntityResponse({ description: '몬가 잘못됨' })
-  @UseInterceptors(FilesInterceptor('images'))
-  create(
-    @Body() createRoomDto: CreateRoomDto,
-    @UploadedFiles(
-      new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType: /(jp[e]?g|png|webp)/,
-        })
-        .addMaxSizeValidator({
-          maxSize: 50_000_000,
-        })
-        .build(),
-    )
-    images: Express.Multer.File[],
-  ) {
-    const fileResults = this.uploadsService.uploadFiles(images);
-    return this.roomsService.create(createRoomDto, fileResults);
+  create(@Body() createRoomDto: CreateRoomDto) {
+    return this.roomsService.create(createRoomDto);
   }
 
   @Patch(':id')

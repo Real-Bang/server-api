@@ -1,23 +1,22 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { UploadsResult } from '@/uploads/uploads.service';
+import { CursorPaginationDto } from '@/utils/pagination/pagination.cursor.dto';
 import { Injectable } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
-import { CursorPaginationDto } from '@/utils/pagination/pagination.cursor.dto';
 
 @Injectable()
 export class RoomsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createRoomDto: CreateRoomDto, images: UploadsResult[]) {
+  async create(createRoomDto: CreateRoomDto) {
     return await this.prisma.room.create({
       data: {
         ...createRoomDto,
         options: {
           connect: createRoomDto.options.map((option) => ({ key: option })),
         },
-        thumbnailUrl: images[0].url,
-        photoUrl: images.map((image) => image.url),
+        thumbnailUrl: createRoomDto.imageUrls[0],
+        photoUrl: createRoomDto.imageUrls,
       },
     });
   }

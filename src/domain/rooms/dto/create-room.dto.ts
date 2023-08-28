@@ -1,9 +1,7 @@
-import { Logger } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { type Room } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
-  IsArray,
   IsBoolean,
   IsInt,
   IsNumber,
@@ -13,15 +11,14 @@ import {
 
 export class CreateRoomDto implements Partial<Room> {
   @ApiProperty({
-    description: '방의 이미지\n\n첫 이미지가 대표 이미지가 됨.',
+    description: '방의 이미지가 포함된 URI\n\n첫 이미지가 대표 이미지가 됨.',
     type: 'array',
     items: {
       type: 'string',
-      format: 'binary',
     },
   })
-  // @IsString({ each: true })
-  images: Express.Multer.File[];
+  @IsString({ each: true })
+  imageUrls: string[];
 
   @ApiProperty({
     description: '판매 형식\n\n원룸, 아파트, 빌라 등등',
